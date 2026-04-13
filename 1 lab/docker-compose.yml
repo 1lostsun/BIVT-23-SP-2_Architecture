@@ -1,0 +1,32 @@
+version: "3.9"
+
+services:
+  app:
+    build: .
+    image: 1lostsun/docker-lab:latest
+    ports:
+      - "8080:8080"
+    environment:
+      PORT: "8080"
+      PG_HOST: db
+      PG_PORT: "5432"
+      PG_USERNAME: postgres
+      PG_PASSWORD: postgres
+      PG_DATABASE: notes
+    depends_on:
+      db:
+        condition: service_healthy
+
+  db:
+    image: postgres:16-alpine
+    ports:
+      - "5432:5432"
+    environment:
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: postgres
+      POSTGRES_DB: notes
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U postgres"]
+      interval: 5s
+      timeout: 5s
+      retries: 5
